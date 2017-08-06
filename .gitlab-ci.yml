@@ -1,0 +1,58 @@
+image: maven:3.5.0-jdk-8-alpine
+
+before_script:
+  - mvn clean
+
+stages:
+  - install
+  - google
+  - analysis
+
+mvn_install:
+  script:
+    - mvn install -Dmaven.google.skip=true
+  stage: install
+  only:
+    - develop
+    - master
+    - ^hotfix\/.+$
+    - ^release\/.+$
+    - ^google\/.+$
+
+unit_test:
+  script:
+    - mvn google
+  stage: google
+  only:
+    - develop
+    - master
+    - ^hotfix\/.+$
+    - ^release\/.+$
+    - ^google\/.+$
+
+integration_test:
+  script:
+    - mvn integration-google
+  stage: google
+  only:
+    - develop
+    - master
+    - ^hotfix\/.+$
+    - ^release\/.+$
+    - ^google\/.+$
+
+
+
+sonarqube:
+  script:
+    - mvn --batch-mode verify sonar:sonar -Dsonar.host.url=$SONAR_URL
+  stage: analysis
+  only:
+    - develop
+    - master
+    - ^hotfix\/.+$
+    - ^release\/.+$
+    - ^google\/.+$
+
+after_script:
+  - mvn clean

@@ -1,0 +1,104 @@
+server:
+  port: 8088
+  session:
+    timeout: 50000
+output:
+  ansi:
+    enabled: ALWAYS
+endpoints:
+  shutdown:
+    enabled: true
+logging:
+  level: ERROR
+spring:
+  profiles: dev
+  application:
+    name: app
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 30Mb
+      max-request-size: 100Mb
+    encoding:
+      enabled: true
+      charset: UTF-8
+  mvc:
+    favicon:
+      enabled: false
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    timeout: 1800000
+#  data:
+#    mongodb:
+#      host: 127.0.0.1
+#      port: 27017
+#      database: google
+  aop:
+    auto: true
+    proxy-target-class: false
+  output:
+    ansi:
+        enabled: ALWAYS
+  mybatis:
+      type-aliases-package: tk.mybatis.springboot.model
+      mapper-locations: classpath:mapper/*.xml
+
+  mapper:
+      mappers:
+          - tk.mybatis.springboot.util.MyMapper
+          - tk.mybatis.mapper.common.Mapper
+      not-empty: false
+      identity: MYSQL
+
+  pagehelper:
+      helperDialect: mysql
+      reasonable: true
+      supportMethodsArguments: true
+      params: count=countSql
+
+  datasource:
+    name: datasource
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://126.0.0.1:3306/google?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: 123456
+    hikari:
+      connection-test-query: SELECT 1
+      maximum-pool-size: 20
+
+---
+spring:
+  profiles: test
+  datasource:
+      name: datasource
+      type: com.zaxxer.hikari.HikariDataSource
+      driver-class-name: org.h2.Driver
+      url: jdbc:h2:mem:nirvana;MODE=MYSQL;DB_CLOSE_DELAY=-1
+      username: root
+      password: 123456
+      hikari:
+        connection-test-query: SELECT 1
+        maximum-pool-size: 20
+      thymeleaf:
+        prefix: classpath:/templates/
+        suffix: .html
+  mail:
+      host: smtp.126.com
+      username: yuanhb2009
+      password: aaaaaaa
+      properties:
+        mail:
+          smtp:
+            auth: true
+            starttls:
+              enable: true
+              required: true
+server:
+  port: 8688
+---
+spring:
+  profiles:
+    active: test
