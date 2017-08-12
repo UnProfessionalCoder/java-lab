@@ -1,4 +1,5 @@
-package com.newbig.app.imagesearch;
+package com.newbig.ocr;
+
 
 import javafx.util.Pair;
 import org.bytedeco.javacpp.*;
@@ -8,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.IntBuffer;
 import java.util.Vector;
 
 import static org.bytedeco.javacpp.lept.pixDestroy;
@@ -29,10 +29,10 @@ public class OCR {
                 System.exit(1);
             }
 
-            opencv_core.IplImage image = cvLoadImage(imagePath);
-            opencv_core.IplImage imageresize = cvCreateImage(cvSize(image.width() * 3, image.height() * 3), IPL_DEPTH_8U, 3);
-            cvResize(image, imageresize, CV_INTER_LINEAR);
-            opencv_core.Mat resultImage = cvarrToMat(imageresize);
+            opencv_core.IplImage image = opencv_imgcodecs.cvLoadImage(imagePath);
+            opencv_core.IplImage imageresize = opencv_core.cvCreateImage(opencv_core.cvSize(image.width() * 3, image.height() * 3), opencv_core.IPL_DEPTH_8U, 3);
+            opencv_imgproc.cvResize(image, imageresize, opencv_imgproc.CV_INTER_LINEAR);
+            opencv_core.Mat resultImage = opencv_core.cvarrToMat(imageresize);
             //MatVector rgb = new MatVector();
             //cvtColor(rgb.get(1), grayImage, CV_BGR2GRAY);
 //        opencv_core.Mat grayImage = new opencv_core.Mat();
@@ -219,7 +219,7 @@ public class OCR {
                 return 0;
     }
     public static void ostuBeresenThreshold( Mat in, Mat out){
-        double ostu_T = threshold(in , out, 0,255 ,CV_THRESH_OTSU); //otsu获得全局阈值
+        double ostu_T = opencv_imgproc.threshold(in , out, 0,255 , opencv_imgproc.CV_THRESH_OTSU); //otsu获得全局阈值
 
         DoublePointer min = new DoublePointer();
         DoublePointer max = new DoublePointer();
@@ -256,7 +256,7 @@ public class OCR {
                 }
                 else
                 {
-                    Tbn = sumElems((doubleMatIn.apply(new Rect(i-2,j-2,5,5)).col(0))).get()/25 ;  //窗口大小25*25
+                    Tbn = opencv_core.sumElems((doubleMatIn.apply(new Rect(i-2,j-2,5,5)).col(0))).get()/25 ;  //窗口大小25*25
                     if(p.get(Long.valueOf(j)) < beta_lowT || (p.get(Long.valueOf(j))< Tbn &&  (beta_lowT <= p.get(Long.valueOf(j)) && p.get(Long.valueOf(j)) >= beta_highT)))
                         outPtr.put(Long.valueOf(j),Byte.valueOf(0+""));
                     if( p.get(Long.valueOf(j)) > beta_highT || (p.get(Long.valueOf(j))>= Tbn &&  (beta_lowT <= p.get(Long.valueOf(j)) && p.get(Long.valueOf(j)) >= beta_highT)))
@@ -268,13 +268,13 @@ public class OCR {
     }
     public static Mat getRplane(final Mat in) {
         MatVector splitBGR= new MatVector(in.channels()); //容器大小为通道数3
-        split(in,splitBGR);
+        opencv_core.split(in,splitBGR);
         //return splitBGR[2];  //R分量
 
         if(in.cols() > 700 |in.cols() >600)
         {
-            Mat resizeR= new Mat( 450,600 , CV_8UC1);
-            resize( splitBGR.get(Long.valueOf(2)) ,resizeR ,resizeR.size());
+            Mat resizeR= new Mat( 450,600 , opencv_core.CV_8UC1);
+            opencv_imgproc.resize( splitBGR.get(Long.valueOf(2)) ,resizeR ,resizeR.size());
 
             return resizeR;
         }
@@ -291,14 +291,14 @@ public class OCR {
 
         //利用阈值二值化
         Mat testRectClone = in.clone();
-        threshold(testRectClone, testRectClone, 120, 255, CV_THRESH_BINARY);
+        opencv_imgproc.threshold(testRectClone, testRectClone, 120, 255, opencv_imgproc.CV_THRESH_BINARY);
         //imshow("threshold",testRectClone);
         //waitKey(0);
         //输入图像
         //输出图像
         //单元大小，这里是3*3的8位单元
         //腐蚀位置，为负值取核中心
-        erode(testRectClone,in,new Mat(3,3,CV_8U));
+        opencv_imgproc.erode(testRectClone,in,new Mat(3,3, opencv_core.CV_8U));
         //imshow("erodeMat",in);
         //waitKey(0);
         Mat imgInv= new Mat(in.size(),in.type(),new Scalar(255));
@@ -307,17 +307,17 @@ public class OCR {
 
         //cv::imshow("threshold_Inv",threshold_Inv);
         //waitKey(0);
-        Mat element = getStructuringElement(MORPH_RECT ,new Size(18 ,13));  //闭形态学的结构元素
-        morphologyEx(threshold_Inv ,threshold_Inv,CV_MOP_CLOSE,element);
+        Mat element = opencv_imgproc.getStructuringElement(opencv_imgproc.MORPH_RECT ,new Size(18 ,13));  //闭形态学的结构元素
+        opencv_imgproc.morphologyEx(threshold_Inv ,threshold_Inv, opencv_imgproc.CV_MOP_CLOSE,element);
         //cv::imshow("morphologyEx",threshold_Inv);
         //waitKey(0);
 
         MatVector contours=new MatVector();
-        findContours(threshold_Inv ,contours,CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);//只检测外轮廓
+        opencv_imgproc.findContours(threshold_Inv ,contours, opencv_imgproc.CV_RETR_EXTERNAL, opencv_imgproc.CV_CHAIN_APPROX_NONE);//只检测外轮廓
         //对候选的轮廓进行进一步筛选
         for(long i=0;i< contours.size();i++)
         {
-            Rect mr = boundingRect(new Mat(contours.get(i))); //返回每个轮廓的最小有界矩形区域
+            Rect mr = opencv_imgproc.boundingRect(new Mat(contours.get(i))); //返回每个轮廓的最小有界矩形区域
             int infoType=0;
             if(mr.size().width()==0||mr.size().height()==0){
                  continue;

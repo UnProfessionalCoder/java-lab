@@ -61,11 +61,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-/**
- * Created by: Mathias Lux, mathias@juggle.at
- * Date: 18.02.2010
- * Time: 15:20:59
- */
 public class MetadataBuilder implements DocumentBuilder {
 
     public MetadataBuilder() {

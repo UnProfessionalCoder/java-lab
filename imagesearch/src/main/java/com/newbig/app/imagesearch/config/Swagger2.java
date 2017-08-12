@@ -20,7 +20,7 @@ public class Swagger2 {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.xiaofan.app"))
+                .apis(RequestHandlerSelectors.basePackage("com.newbig.app"))
                 .paths(PathSelectors.any())
                 .build();
     }
@@ -29,7 +29,7 @@ public class Swagger2 {
         return new ApiInfoBuilder()
                 .title("Spring Boot中使用Swagger2构建RESTful APIs")
                 .description("demo")
-                .termsOfServiceUrl("http://127.0.0.1:8080/")
+                .termsOfServiceUrl("http://127.0.0.1:8688/")
                 .contact("app")
                 .version("1.0")
                 .build();

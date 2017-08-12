@@ -48,13 +48,7 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * ...
- * Date: 10.06.2008
- * Time: 17:24:32
- *
- * @author Mathias Lux, mathias@juggle.at
- */
+
 public class ParallelIndexer implements Runnable {
     // Vectors are already synchronized, so that's the cheap solution.
     Vector<String> imageFiles;

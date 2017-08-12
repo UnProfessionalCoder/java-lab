@@ -56,7 +56,7 @@ spring:
       supportMethodsArguments: true
       params: count=countSql
   datasource:
-    name: nirvanaDatasource
+    name: datasource
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://126.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
@@ -65,20 +65,15 @@ spring:
     hikari:
       connection-test-query: SELECT 1
       maximum-pool-size: 20
-  velocity:
-    cache: false
-    resource-loader-path: classpath:/templates/
-    number-tool-attribute: number
-    date-tool-attribute: date
 
 ---
 spring:
   profiles: local
   datasource:
-      name: nirvanaDatasource
+      name: datasource
       type: com.zaxxer.hikari.HikariDataSource
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/nirvana?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+      url: jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
       username: root
       password: 123456
       hikari:
